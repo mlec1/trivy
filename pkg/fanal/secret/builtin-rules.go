@@ -71,6 +71,7 @@ var (
 	CategoryTypeform             = types.SecretRuleCategory("Typeform")
 	CategoryDocker               = types.SecretRuleCategory("Docker")
 	CategoryHuggingFace          = types.SecretRuleCategory("HuggingFace")
+	CategoryExoscale             = types.SecretRuleCategory("Exoscale")
 )
 
 // Reusable regex patterns
@@ -845,5 +846,23 @@ var builtinRules = []Rule{
 		Regex:           MustCompile(`(?i)(\.(dockerconfigjson|dockercfg):\s*\|*\s*(?P<secret>(ey|ew)+[A-Za-z0-9\/\+=]+))`),
 		SecretGroupName: "secret",
 		Keywords:        []string{"dockerc"},
+	},
+	{
+		ID:              "exoscale-api-key-id",
+		Category:        CategoryExoscale,
+		Severity:        "CRITICAL",
+		Title:           "Exoscale API Key ID",
+		Regex:           MustCompileWithoutWordPrefix(fmt.Sprintf(`(?P<secret>EXO[a-z0-9]{24})%s%s`, quote, endSecret)),
+		SecretGroupName: "secret",
+		Keywords:        []string{"EXO"},
+	},
+	{
+		ID:              "exoscale-api-key-secret",
+		Category:        CategoryExoscale,
+		Severity:        "CRITICAL",
+		Title:           "Exoscale API Key Secret",
+		Regex:           MustCompile(fmt.Sprintf(`(?i)%s%s(sec(ret)?)?_?(access)?_?key%s%s%s(?P<secret>[A-Za-z0-9\-_]{43})%s%s`, quote, aws, quote, connect, quote, quote, endSecret)),
+		SecretGroupName: "secret",
+		Keywords:        []string{"key"},
 	},
 }
